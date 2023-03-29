@@ -9,6 +9,11 @@ public class Gun : MonoBehaviour
     [SerializeField] private Transform muzzle;
     float timeSinceLastShot;
     public TextManager textManager;
+    public AudioClip audioSourceShot;
+    public AudioClip audioSourceEmptyMag;
+    public AudioClip audioSourceReload;
+    private AudioSource audioSource;
+
 
     private bool CanShoot() => !gunData.reloading && timeSinceLastShot > 1f / (gunData.fireRate / 60f);
 
@@ -16,6 +21,7 @@ public class Gun : MonoBehaviour
     {
         PlayerShoot.shootInput += Shoot;
         PlayerShoot.reloadInput += startReloading;
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -37,6 +43,13 @@ public class Gun : MonoBehaviour
             gunData.currentAmmo--;
             timeSinceLastShot = 0;
             textManager.UpdateAmmo(gunData.currentAmmo);
+            audioSource.PlayOneShot(audioSourceShot);
+
+        }
+
+        if (gunData.currentAmmo <= 0)
+        {
+            audioSource.PlayOneShot(audioSourceEmptyMag);
         }
     }
 
@@ -51,6 +64,7 @@ public class Gun : MonoBehaviour
     private IEnumerator Reload()
     {
         gunData.reloading = true;
+        audioSource.PlayOneShot(audioSourceReload);
         yield return new WaitForSeconds(gunData.reloadTime);
         gunData.currentAmmo = gunData.magSize;
         textManager.UpdateAmmo(gunData.currentAmmo);
