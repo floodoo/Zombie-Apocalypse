@@ -8,6 +8,7 @@ public class Gun : MonoBehaviour
     [SerializeField] private GunData gunData;
     [SerializeField] private Transform muzzle;
     float timeSinceLastShot;
+    public TextManager textManager;
 
     private bool CanShoot() => !gunData.reloading && timeSinceLastShot > 1f / (gunData.fireRate / 60f);
 
@@ -35,6 +36,7 @@ public class Gun : MonoBehaviour
 
             gunData.currentAmmo--;
             timeSinceLastShot = 0;
+            textManager.UpdateAmmo(gunData.currentAmmo);
         }
     }
 
@@ -51,6 +53,7 @@ public class Gun : MonoBehaviour
         gunData.reloading = true;
         yield return new WaitForSeconds(gunData.reloadTime);
         gunData.currentAmmo = gunData.magSize;
+        textManager.UpdateAmmo(gunData.currentAmmo);
         gunData.reloading = false;
     }
 }
